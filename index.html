@@ -4,6 +4,31 @@
     <script src="./bower_components/threejs/build/three.js"></script>
     <script src="./bower_components/stats.js/build/stats.min.js"></script>
     <script src="./coastline.js"></script>
+    <script id="texturedVert" type="x-shader/x-vertex">
+        varying vec2 vUv;
+
+        void main() {
+            vUv = uv;
+
+            gl_Position =   projectionMatrix *
+                            modelViewMatrix *
+                            vec4(position,1.0);
+        }
+    </script>
+    <script id="texturedFrag" type="x-shader/x-fragment">
+        uniform sampler2D texture1;
+        uniform float cutoff;
+        varying vec2 vUv;
+
+        void main() {
+            vec4 sample = texture2D(texture1, vUv);
+            if (sample.r > cutoff) {
+                sample.rgb = vec3(1.0, 0.0, 0.0);
+            }
+            gl_FragColor = sample;
+            //gl_FragColor = vec4(0.5, 0.2, 1.0, 1.0);
+        }
+    </script>
     <script type="x-shader/x-vertex" id="vert">
         uniform float time;
 
@@ -29,6 +54,7 @@
             vec3 q = degToRad(position);
             q.x += time;
             vec3 p = sphereToCartesian(q);
+            // p.x += 2.0;
             p *= 50.0;
             gl_Position = projectionMatrix * modelViewMatrix * vec4(p,1.0);
         }
@@ -48,6 +74,7 @@
     </script>
 </head>
 <body>
+<!-- <img src="./ocean_dist.png" /> -->
 <div id="container"></div>
 </body>
 <script src="./main.js"></script>

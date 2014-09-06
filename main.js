@@ -1,6 +1,6 @@
 // set the scene size
-var WIDTH = 400,
-    HEIGHT = 300,
+var WIDTH = 800,
+    HEIGHT = 600,
     VIEW_ANGLE = 45,
     ASPECT = WIDTH / HEIGHT,
     NEAR = 0.1,
@@ -32,16 +32,44 @@ var material = new THREE.ShaderMaterial({
     fragmentShader: fShader
 });
 
-var geometry, lineData, pointData, x, y;
-coastline.forEach(function (lineData) {
-    geometry = new THREE.Geometry();
-    lineData.forEach(function (pointData) {
-        x = pointData[0];
-        y = pointData[1];
-        geometry.vertices.push(new THREE.Vector3(x, y, 0));
-    });
-    scene.add(new THREE.Line(geometry, material));
+// var geometry, lineData, pointData, x, y;
+// coastline.forEach(function (lineData) {
+//     geometry = new THREE.Geometry();
+//     lineData.forEach(function (pointData) {
+//         x = pointData[0];
+//         y = pointData[1];
+//         geometry.vertices.push(new THREE.Vector3(x, y, 0));
+//     });
+//     scene.add(new THREE.Line(geometry, material));
+// });
+
+var uniforms2 = {
+    // time: { type: 'f', value: 0.0 },
+    texture1: { type: 't', value: THREE.ImageUtils.loadTexture('./ocean_dist.png') },
+    cutoff: { type: 'f', value: 0.01 }
+};
+
+var textVShader = document.getElementById('texturedVert').innerText,
+    textFShader = document.getElementById('texturedFrag').innerText;
+
+var geometry2   = new THREE.SphereGeometry(50, 32, 32);
+var material2  = new THREE.ShaderMaterial({
+    uniforms: uniforms2,
+    vertexShader: textVShader,
+    fragmentShader: textFShader
 });
+material2.map    = THREE.ImageUtils.loadTexture('./ocean_dist.png')
+var earthMesh = new THREE.Mesh(geometry2, material2);
+scene.add(earthMesh);
+
+// add subtle blue ambient lighting
+var ambientLight = new THREE.AmbientLight(0x444499);
+scene.add(ambientLight);
+
+// directional lighting
+var directionalLight = new THREE.DirectionalLight(0xffffff);
+directionalLight.position.set(1, 1, 1).normalize();
+scene.add(directionalLight);
 
 var startTime = new Date();
 var dt = 0.0;
@@ -49,7 +77,7 @@ var dt = 0.0;
 function tick() {
     var now = new Date();
     dt = (now - startTime) / 1000.0;
-    uniforms.time.value = dt;
+    uniforms.time.value = Math.PI/2;//dt/3;
 }
 
 function render() {

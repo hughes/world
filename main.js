@@ -45,14 +45,14 @@ var material = new THREE.ShaderMaterial({
 
 var uniforms2 = {
     // time: { type: 'f', value: 0.0 },
-    texture1: { type: 't', value: THREE.ImageUtils.loadTexture('./ocean_dist.png') },
-    cutoff: { type: 'f', value: 0.01 }
+    texture1: { type: 't', value: THREE.ImageUtils.loadTexture('./ocean_dist_resize.png') },
+    cutoff: { type: 'f', value: 0.456887065393 }
 };
 
 var textVShader = document.getElementById('texturedVert').innerText,
     textFShader = document.getElementById('texturedFrag').innerText;
 
-var geometry2   = new THREE.SphereGeometry(50, 32, 32);
+var geometry2   = new THREE.SphereGeometry(80, 32, 32);
 var material2  = new THREE.ShaderMaterial({
     uniforms: uniforms2,
     vertexShader: textVShader,
@@ -61,6 +61,7 @@ var material2  = new THREE.ShaderMaterial({
 material2.map    = THREE.ImageUtils.loadTexture('./ocean_dist.png')
 var earthMesh = new THREE.Mesh(geometry2, material2);
 scene.add(earthMesh);
+window.mesh = earthMesh;
 
 // add subtle blue ambient lighting
 var ambientLight = new THREE.AmbientLight(0x444499);
@@ -81,6 +82,7 @@ function tick() {
 }
 
 function render() {
+    earthMesh.rotation.y = dt / 4.0;
     renderer.render(scene, camera);
 }
 

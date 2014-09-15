@@ -19,11 +19,17 @@
         uniform sampler2D texture1;
         uniform float cutoff;
         varying vec2 vUv;
+        float trace = 0.005;
+        float land_trace = 0.1;
 
         void main() {
             vec4 sample = texture2D(texture1, vUv);
-            if (sample.r > cutoff) {
-                sample.rgb = vec3(1.0, 0.0, 0.0);
+            if (sample.r > cutoff + trace) {
+                sample.rgb = vec3(0.3, 0.6, 1.0);
+            } else if (sample.r > cutoff - trace) {
+                sample.rgb = vec3(0.0);
+            } else {
+                sample.rgb = vec3(0.8, 0.5, 0.1) - (vec3(1.0) * clamp(sample.r, cutoff - trace - land_trace, cutoff - trace) - vec3(cutoff));
             }
             gl_FragColor = sample;
             //gl_FragColor = vec4(0.5, 0.2, 1.0, 1.0);

@@ -1,9 +1,7 @@
 <html>
 <head>
     <title></title>
-    <script src="./bower_components/threejs/build/three.js"></script>
-    <script src="./bower_components/stats.js/build/stats.min.js"></script>
-    <script src="./coastline.js"></script>
+    <script src="./bower_components/threejs/build/three.min.js"></script>
     <style>
     body {
         background: black;
@@ -24,9 +22,10 @@
     <script id="texturedVert" type="x-shader/x-vertex">
         varying vec2 vUv;
         varying vec3 vNormal;
+        uniform float time;
 
         void main() {
-            vUv = uv;
+            vUv = uv - vec2(time/32.0, 0.0);
             vNormal = vec3(modelViewMatrix * vec4(normal, 1.0));
 
             gl_Position =   projectionMatrix *
@@ -44,7 +43,7 @@
 
         void main() {
             float norm_magnitude = length(vec2(vNormal));
-            float edge_color =pow(norm_magnitude, 30.0) * 4.0;
+            float edge_color =pow(norm_magnitude, 30.0) * 8.0;
             vec4 sample = texture2D(texture1, vUv);
 
             if (sample.r > cutoff + trace) {
@@ -57,60 +56,15 @@
             }
             sample.rgb += edge_color * vec3(0.3, 1.0, 0.4);
             gl_FragColor = sample;
-            //gl_FragColor = vec4(0.5, 0.2, 1.0, 1.0);
         }
-    </script>
-    <script type="x-shader/x-vertex" id="vert">
-        uniform float time;
-
-        // switch on high precision floats
-        #ifdef GL_ES
-        precision highp float;
-        #endif
-
-        #define DEG2RAD 2.0*3.14159/360.0;
-
-        vec3 degToRad(vec3 p) {
-            return p * DEG2RAD;
-        }
-
-        vec3 sphereToCartesian(vec3 p) {
-            return vec3(sin(p.x) * cos(p.y),
-                        sin(p.y),
-                        cos(p.x) * cos(p.y));
-        }
-
-        void main()
-        {
-            vec3 q = degToRad(position);
-            q.x += time;
-            vec3 p = sphereToCartesian(q);
-            // p.x += 2.0;
-            p *= 50.0;
-            gl_Position = projectionMatrix * modelViewMatrix * vec4(p,1.0);
-        }
-
-    </script>
-    <script type="x-shader/x-fragment" id="frag">
-        uniform float time;
-        #ifdef GL_ES
-        precision highp float;
-        #endif
-
-        void main()
-        {
-            gl_FragColor = vec4(1.0,1.0,1.0,1.0);
-        }
-
     </script>
 </head>
 <body>
-<!-- <img src="./ocean_dist.png" /> -->
 <div id="container"></div>
 <div id="overlay">
-    <p>45&deg;39'41.673" 5790m</p>
-    <p>45&deg;39'41.673" 5790m</p>
-    <p>45&deg;39'41.673" 5790m</p>
+    <p>43&deg; 39' 41.7738", -79&deg; 22' 57.8964", 2074m</p>
+    <p>43&deg; 42' 24.2136", -79&deg; 23' 54.0060", 3429m </p>
+    <p>43&deg; 39' 31.9458", -79&deg; 26' 24.7848", 5564m</p>
 </div>
 </body>
 <script src="./main.js"></script>

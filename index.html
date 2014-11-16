@@ -4,11 +4,30 @@
     <script src="./bower_components/threejs/build/three.js"></script>
     <script src="./bower_components/stats.js/build/stats.min.js"></script>
     <script src="./coastline.js"></script>
+    <style>
+    body {
+        background: black;
+        margin: 0;
+        padding: 0;
+    }
+    #overlay {
+        position: absolute;
+        color: rgb(77, 255, 102);
+        font-size: 3vh;
+        font-family: courier;
+        top: 38%;
+        width: 100%;
+        text-align: center;
+        text-shadow: 0px 0px 10px rgb(77, 255, 102);
+    }
+    </style>
     <script id="texturedVert" type="x-shader/x-vertex">
         varying vec2 vUv;
+        varying vec3 vNormal;
 
         void main() {
             vUv = uv;
+            vNormal = vec3(modelViewMatrix * vec4(normal, 1.0));
 
             gl_Position =   projectionMatrix *
                             modelViewMatrix *
@@ -19,18 +38,24 @@
         uniform sampler2D texture1;
         uniform float cutoff;
         varying vec2 vUv;
-        float trace = 0.005;
+        varying vec3 vNormal;
+        float trace = 0.008;
         float land_trace = 0.1;
 
         void main() {
+            float norm_magnitude = length(vec2(vNormal));
+            float edge_color =pow(norm_magnitude, 30.0) * 4.0;
             vec4 sample = texture2D(texture1, vUv);
+
             if (sample.r > cutoff + trace) {
-                sample.rgb = vec3(0.3, 0.6, 1.0);
-            } else if (sample.r > cutoff - trace) {
                 sample.rgb = vec3(0.0);
+            } else if (sample.r > cutoff - trace) {
+                float val = 1.0 - (sample.r - (cutoff - trace)) / (1.0 - (cutoff - trace))*50.0;
+                sample.rgb = max(0.0, val) * vec3(0.3, 1.0, 0.4);
             } else {
-                sample.rgb = vec3(0.8, 0.5, 0.1) - (vec3(1.0) * clamp(sample.r, cutoff - trace - land_trace, cutoff - trace) - vec3(cutoff));
+                sample.rgb = vec3(0.0);
             }
+            sample.rgb += edge_color * vec3(0.3, 1.0, 0.4);
             gl_FragColor = sample;
             //gl_FragColor = vec4(0.5, 0.2, 1.0, 1.0);
         }
@@ -82,6 +107,11 @@
 <body>
 <!-- <img src="./ocean_dist.png" /> -->
 <div id="container"></div>
+<div id="overlay">
+    <p>45&deg;39'41.673" 5790m</p>
+    <p>45&deg;39'41.673" 5790m</p>
+    <p>45&deg;39'41.673" 5790m</p>
+</div>
 </body>
 <script src="./main.js"></script>
 </html>

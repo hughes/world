@@ -1,6 +1,6 @@
 // set the scene size
-var WIDTH = 800,
-    HEIGHT = 600,
+var WIDTH = window.innerWidth,
+    HEIGHT = window.innerHeight,
     VIEW_ANGLE = 45,
     ASPECT = WIDTH / HEIGHT,
     NEAR = 0.1,
@@ -14,6 +14,14 @@ var scene = new THREE.Scene();
 scene.add(camera);
 camera.position.z = 300;
 renderer.setSize(WIDTH, HEIGHT);
+
+window.addEventListener('resize', onWindowResize, false);
+
+function onWindowResize(){
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+}
 
 var container = document.getElementById('container');
 container.appendChild(renderer.domElement);

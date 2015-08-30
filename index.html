@@ -1,3 +1,4 @@
+
 <html>
 <head>
     <title></title>
@@ -13,10 +14,22 @@
         color: rgb(77, 255, 102);
         font-size: 3vh;
         font-family: courier;
-        top: 38%;
+        top: 30%;
         width: 100%;
         text-align: center;
         text-shadow: 0px 0px 10px rgb(77, 255, 102);
+    }
+    a, a:visited {
+        color: rgb(77, 255, 102);
+    }
+    a:hover {
+        color: rgb(112, 255, 131);
+    }
+    pre {
+        display: inline;
+    }
+    .iconHover {
+        cursor: pointer;
     }
     </style>
     <script id="texturedVert" type="x-shader/x-vertex">
@@ -58,13 +71,45 @@
             gl_FragColor = sample;
         }
     </script>
+    <script id="iconVert" type="x-shader/x-vertex">
+        varying vec2 vUv;
+        varying vec3 vNormal;
+        uniform float time;
+
+        void main() {
+            vec2 offset = vec2(0.5, 0.5);
+            vUv = (uv-offset)*(1.0+0.1*sin(time*5.0))+offset;
+            vNormal = vec3(modelViewMatrix * vec4(normal, 1.0));
+
+            gl_Position =   projectionMatrix *
+                            modelViewMatrix *
+                            vec4(position,1.0);
+        }
+    </script>
+    <script id="iconFrag" type="x-shader/x-fragment">
+        uniform sampler2D texture1;
+        uniform float cutoff;
+        varying vec2 vUv;
+        varying vec3 vNormal;
+        float trace = 0.008;
+        float land_trace = 0.1;
+
+        void main() {
+            vec4 sample = texture2D(texture1, vUv);
+            float value = sample.r;
+            vec3 color = vec3(0.3, 1.0, 0.4);
+            gl_FragColor = vec4(color, value);
+        }
+    </script>
 </head>
 <body>
 <div id="container"></div>
 <div id="overlay">
-    <p>43&deg; 39' 41.7738", -79&deg; 22' 57.8964", 2074m</p>
-    <p>43&deg; 42' 24.2136", -79&deg; 23' 54.0060", 3429m </p>
-    <p>43&deg; 39' 31.9458", -79&deg; 26' 24.7848", 5564m</p>
+<p>Matthew Hughes<p>
+<p><pre><a href="https://github.com/hughes/">hughes</a></pre> on github</p>
+<p><pre>ghost[]</pre> on freenode</p>
+<p>hughesm02 at gmail dot com</p>
+<p>matthew.hughes at spacex dot com</p>
 </div>
 </body>
 <script src="./main.js"></script>
